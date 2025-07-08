@@ -15,41 +15,17 @@
     </div>
 
     <script>
-    async function checkFakeNews() {
-        const input = document.getElementById("newsInput").value.trim();
-        const resultBox = document.getElementById("resultBox");
-        const resultLabel = document.getElementById("resultLabel");
-
-        // Clear old result
-        resultLabel.innerText = "";
-
-        if (!input) {
-            resultBox.style.display = "block";
-            return;
-        }
-
-        resultLabel.innerText = "Checking...";
-        resultBox.style.display = "block";
-
-        try {
+        async function checkFakeNews() {
+            const text = document.getElementById("newsInput").value;
             const res = await fetch("/predict", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: input })
+                body: JSON.stringify({ text: text })
             });
-
             const data = await res.json();
-
-            if (data.error) {
-                resultLabel.innerText = ` Error: ${data.error}`;
-            } else {
-                const resultText = `${data.label} (${data.confidence}%)`;
-                resultLabel.innerText = " Prediction: " + resultText;
-            }
-        } catch (err) {
-            resultLabel.innerText = " Failed to connect to server.";
+            const result = `${data.label} (${data.confidence}%)`;
+            document.getElementById("resultLabel").innerText = "Prediction: " + result;
         }
-    }
-</script>
+    </script>
 </body>
 </html>

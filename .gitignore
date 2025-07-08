@@ -1,31 +1,17 @@
 # Ignore virtual environment
 myenv/
 
-# Ignore Safetensors file
-*.safetensors
-
 # Ignore Python cache files
 __pycache__/
 *.py[cod]
 
-# Ignore model artifacts
-*.bin
-*.zip
-*.h5
-
-# Ignore tokenizer files
-tokenizer_config.json
-special_tokens_map.json
-
-# Ignore Jupyter notebook junk
+# Ignore Jupyter notebooks checkpoints
 .ipynb_checkpoints/
 
-# Ignore OS system files
+# Ignore model outputs or large temporary files
+*.bin
+*.zip
+
+# Ignore OS/system files
 .DS_Store
 Thumbs.db
-
-# VS Code settings
-.vscode/
-
-# Render build logs
-*.log
