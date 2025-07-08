@@ -14,8 +14,8 @@ __pycache__/
 *.h5
 
 # Ignore tokenizer files
-*.txt
-*.json
+tokenizer_config.json
+special_tokens_map.json
 
 # Ignore Jupyter notebook junk
 .ipynb_checkpoints/
