@@ -2,6 +2,22 @@ from flask import Flask, render_template, request, jsonify
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import torch.nn.functional as F
+import os
+import requests
+import gdown
+
+MODEL_PATH = "saved_model"
+MODEL_FILE = os.path.join(MODEL_PATH, "model.safetensors")
+
+# Your actual Google Drive file ID
+FILE_ID = "1bYp6DDRLQy9pDS3h0bnFun-VMr2Z4mm3"
+URL = f"https://drive.google.com/uc?id={FILE_ID}"
+
+if not os.path.exists(MODEL_FILE):
+    print("Model not found locally. Downloading from Google Drive...")
+    os.makedirs(MODEL_PATH, exist_ok=True)
+    gdown.download(URL, MODEL_FILE, quiet=False)
+    print("Model download complete.")
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -22,8 +38,11 @@ def home():
 def predict():
     try:
         data = request.get_json()
-        text = data.get("text", "")
-        if not text.strip():
+        if not data or 'text' not in data:
+            return jsonify({"error": "No input provided"}), 400
+
+        text = data.get("text", "").strip()
+        if not text:
             return jsonify({"error": "Empty input"}), 400
 
         inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
@@ -34,7 +53,7 @@ def predict():
             label = "Real" if pred == 0 else "Fake"
             confidence = round(probs[0][pred].item() * 100, 2)
 
-        return jsonify({ "label": label, "confidence": confidence })
+        return jsonify({"label": label, "confidence": confidence})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
