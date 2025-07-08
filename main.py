@@ -7,15 +7,21 @@ import requests
 
 # Download model
 MODEL_PATH = "saved_model"
+MODEL_URL = "https://drive.google.com/uc?id=1bYp6DDRLQy9pDS3h0bnFun-VMr2Z4mm3"
 MODEL_FILE = os.path.join(MODEL_PATH, "model.safetensors")
-MODEL_URL = "https://drive.google.com/uc?export=download&id=1bYp6DDRLQy9pDS3h0bnFun-VMr2Z4mm3"
 
+# Auto-download model if not present
 if not os.path.exists(MODEL_FILE):
     print("Model not found locally. Downloading from Google Drive...")
+
     os.makedirs(MODEL_PATH, exist_ok=True)
-    response = requests.get(MODEL_URL)
+    response = requests.get(MODEL_URL, stream=True)
+
     with open(MODEL_FILE, "wb") as f:
-        f.write(response.content)
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk:
+                f.write(chunk)
+
     print("Model download complete.")
 
 # Initialize Flask app
