@@ -4,24 +4,19 @@ import torch
 import torch.nn.functional as F
 import os
 import requests
+import gdown
 
-# Download model
 MODEL_PATH = "saved_model"
-MODEL_URL = "https://drive.google.com/uc?id=1bYp6DDRLQy9pDS3h0bnFun-VMr2Z4mm3"
 MODEL_FILE = os.path.join(MODEL_PATH, "model.safetensors")
 
-# Auto-download model if not present
+# Your actual Google Drive file ID
+FILE_ID = "1bYp6DDRLQy9pDS3h0bnFun-VMr2Z4mm3"
+URL = f"https://drive.google.com/uc?id={FILE_ID}"
+
 if not os.path.exists(MODEL_FILE):
     print("Model not found locally. Downloading from Google Drive...")
-
     os.makedirs(MODEL_PATH, exist_ok=True)
-    response = requests.get(MODEL_URL, stream=True)
-
-    with open(MODEL_FILE, "wb") as f:
-        for chunk in response.iter_content(chunk_size=8192):
-            if chunk:
-                f.write(chunk)
-
+    gdown.download(URL, MODEL_FILE, quiet=False)
     print("Model download complete.")
 
 # Initialize Flask app
