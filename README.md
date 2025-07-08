@@ -18,7 +18,7 @@ The backend is powered by Flask, while the model is hosted using PyTorch and Hug
 ## Live Demo
 
 Visit the deployed app here:  
-👉 ([https://your-app-name.onrender.com](https://fakenewsdetection-v1h7.onrender.com))
+👉 ([Live Link](https://fakenewsdetection-v1h7.onrender.com))
 
 ---
 
