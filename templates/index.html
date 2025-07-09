@@ -1,55 +1,138 @@
 <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Fake News Detector</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FactsAI</title>
+  <link rel="icon" type="image/png" href="/static/images/logo.png" />
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>Fake News Detection</h1>
-        <textarea id="newsInput" placeholder="Paste your news headline here..."></textarea>
-        <button onclick="checkFakeNews()">Check</button>
-        <div id="resultBox">
-            <h2 id="resultLabel"></h2>
-        </div>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <h1>FactsAI</h1>
+    <p>Distinguish fact from fiction with the power of AI.</p>
+    <div class="predict-box">
+      <input type="text" id="inputText" placeholder="Enter your news headline..." />
+      <button onclick="handlePredict()">Predict</button>
     </div>
+    <div id="output" class="output-box" style="display: none;"></div>
+  </header>
 
-    <script>
-    async function checkFakeNews() {
-        const input = document.getElementById("newsInput").value.trim();
-        const resultBox = document.getElementById("resultBox");
-        const resultLabel = document.getElementById("resultLabel");
+  <!-- Model Architectures -->
+  <section class="section">
+    <h2>Model Insights</h2>
+    <div class="tile-grid">
+      <div class="tile-card">
+        <h3>BERT</h3>
+        <img src="/static/images/BERT_architecture.png" alt="BERT Architecture" />
+        <p>BERT captures the meaning of words using both left and right context, thanks to its transformer-based bidirectional architecture. It is trained to predict masked words in a sentence, enabling a deep understanding of language.</p>
+      </div>
+      <div class="tile-card">
+        <h3>DistilBERT</h3>
+        <img src="/static/images/DistilBERT_architecture.png" alt="DistilBERT Architecture" />
+        <p>DistilBERT is a smaller, faster, and lighter version of BERT that retains about 97% of its performance while being 40% smaller and 60% faster. Trained using knowledge distillation, it mimics BERT’s behaviour by focusing on essential features of language without compromising on accuracy, making it a smart trade-off between performance and speed.</p>
+      </div>
+      <div class="tile-card">
+        <h3>MobileBERT</h3>
+        <img src="/static/images/MobileBERT_architecture.png" alt="MobileBERT Architecture" />
+        <p>MobileBERT mirrors the depth of BERT but uses a slimmer, bottleneck architecture to optimize speed and memory. It delivers strong performance while being lightweight. Ideal for deploying on mobile and edge devices.</p>
+      </div>
+      <div class="tile-card">
+        <h3>TinyBERT</h3>
+        <img src="/static/images/TinyBERT_architecture.png" alt="TinyBERT Architecture" />
+        <p>TinyBERT compresses BERT into a much smaller model using a two-stage learning framework involving general-domain and task-specific distillation. Despite its size, it retains impressive accuracy, making it perfect for resource-constrained environments.</p>
+      </div>
+    </div>
+  </section>
 
-        // Clear old result
-        resultLabel.innerText = "";
+  <!-- Comparison Metrics -->
+  <section class="section">
+    <h2>Model Comparison</h2>
+    <div class="tile-grid">
+      <div class="tile-card">
+        <h3>Training Loss</h3>
+        <img src="/static/images/training_loss_bert.png" alt="Training Loss Comparison" />
+        <p>Shows how each model learns over training epochs.</p>
+      </div>
+      <div class="tile-card">
+        <h3>Validation Loss</h3>
+        <img src="/static/images/validation_loss_bert.png" alt="Validation Loss Comparison" />       
+        <p>Indicates how well the model generalizes to unseen data.</p>
+      </div>
+      <div class="tile-card">
+        <h3>Accuracy & F1 Score</h3>
+        <img src="/static/images/accuracy_f1_comparison.png" alt="Accuracy and F1 Score" />
+        <p>Comparison of classification accuracy and F1-score across models.</p>
+      </div>
+      <div class="tile-card">
+        <h3>Inference Time</h3>
+        <img src="/static/images/inference_time_comparison.png" alt="Inference Time" />
+        <p>How long each model takes to make predictions — crucial for real-time systems.</p>
+      </div>
+    </div>
+  </section>
 
-        if (!input) {
-            resultBox.style.display = "block";
-            return;
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>&copy; 2025 FactsAI. All rights reserved.</p>
+      <p>Built by Himadri Neogi</p>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script>
+    async function handlePredict() {
+      const inputText = document.getElementById("inputText").value.trim();
+      const outputBox = document.getElementById("output");
+
+      outputBox.style.display = "flex";
+      outputBox.style.backgroundColor = "";
+      outputBox.textContent = "";
+      outputBox.style.color = "#fff";
+
+      if (!inputText) {
+        outputBox.textContent = "Please enter a headline first.";
+        outputBox.style.backgroundColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--error-color');
+        return;
+      }
+
+      outputBox.textContent = "Predicting...";
+      outputBox.style.backgroundColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--info-color');
+
+      try {
+        const response = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: inputText }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          const label = data.label === "Real" ? "Real" : "Fake";
+          const confidence = data.confidence || 0;
+          outputBox.textContent = `Prediction: ${label} News (Confidence: ${confidence}%)`;
+          outputBox.style.backgroundColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--success-color');
+        } else {
+          outputBox.textContent = `Error: ${data.error || "Something went wrong."}`;
+          outputBox.style.backgroundColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--error-color');
         }
 
-        resultLabel.innerText = "Checking...";
-        resultBox.style.display = "block";
-
-        try {
-            const res = await fetch("/predict", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: input })
-            });
-
-            const data = await res.json();
-
-            if (data.error) {
-                resultLabel.innerText = ` Error: ${data.error}`;
-            } else {
-                const resultText = `${data.label} (${data.confidence}%)`;
-                resultLabel.innerText = " Prediction: " + resultText;
-            }
-        } catch (err) {
-            resultLabel.innerText = " Failed to connect to server.";
-        }
+      } catch (err) {
+        outputBox.textContent = "Error: Could not connect to the prediction server.";
+        outputBox.style.backgroundColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--error-color');
+        console.error("Prediction Error:", err);
+      }
     }
-</script>
+  </script>
 </body>
 </html>
